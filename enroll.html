@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#000000">
+
+  <title>[ENROLL_PAGE_TITLE, e.g. Enroll | Fluency Standard]</title>
+  <meta name="description" content="[ENROLL_META_DESCRIPTION]">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="[ENROLL_OG_TITLE]">
+  <meta property="og:description" content="[ENROLL_OG_DESCRIPTION]">
+  <meta property="og:url" content="[SITE_URL]/enroll.html">
+  <meta property="og:image" content="[OG_IMAGE_URL]">
+
+  <!-- Favicon -->
+  <link rel="icon" href="[FAVICON_PATH]" type="image/svg+xml">
+
+  <!-- Fonts (see index.html for self-hosting notes) -->
+  <link rel="preload" href="[FONT_INSTRUMENT_SERIF_WOFF2_URL]" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="[FONT_INTER_WOFF2_URL]" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body class="page-enroll">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <!-- Header with Back Link -->
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="back-link" href="programs.html">
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+          <path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span>Programs</span>
+      </a>
+      <a class="wordmark" href="index.html">Fluency Standard</a>
+    </div>
+  </header>
+
+  <!-- Main Content: Enrollment Form -->
+  <main id="main-content" class="enroll-main">
+    <div class="container container--form">
+      <header class="page-intro page-intro--left reveal">
+        <p class="eyebrow">Enrollment</p>
+        <h1 class="page-headline">Complete your enrollment</h1>
+      </header>
+
+      <!-- Selected Program Summary Strip -->
+      <section class="program-strip reveal" aria-label="Selected program">
+        <div class="program-strip__info">
+          <span class="program-strip__label">Selected program</span>
+          <p class="program-strip__name" data-program-name>[PROGRAM 1 NAME]</p>
+          <p class="program-strip__fallback" data-program-fallback hidden>
+            No valid program was specified in the link. Showing the default option.
+          </p>
+        </div>
+        <div class="program-strip__meta">
+          <p class="program-strip__price" data-program-price>[PROGRAM 1 PRICE]</p>
+          <a class="text-link" href="programs.html">Change</a>
+        </div>
+      </section>
+
+      <!--
+        BACKEND: POST /api/enroll receives multipart/form-data.
+        Server MUST re-validate every field, verify the CSRF token, reject non-empty
+        honeypot ("website"), look up authoritative price from "program" slug,
+        and validate MIME type, magic bytes, and file size (<= 5MB) of "screenshot".
+      -->
+      <form
+        id="enroll-form"
+        class="enroll-form"
+        method="post"
+        action="/api/enroll"
+        enctype="multipart/form-data"
+        novalidate
+      >
+        <!-- BACKEND: Populated by app.js from ?program= query param; validate against allowlist on server -->
+        <input type="hidden" id="program-input" name="program" value="program-1">
+
+        <!-- BACKEND: Inject server-generated CSRF token before rendering or via session endpoint -->
+        <input type="hidden" id="csrf-token" name="csrf_token" value="">
+
+        <!-- BACKEND: Honeypot anti-spam field. Must be empty on submission. -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="website">Website</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <!-- STEP 1: Your details -->
+        <fieldset class="step-card reveal">
+          <legend class="step-legend">
+            <span class="step-number">Step 01</span>
+            <span class="step-title">Your details</span>
+          </legend>
+
+          <!-- BACKEND: Field list below uses placeholders and may be adjusted before launch -->
+          <div class="form-grid">
+            <div class="field field--full">
+              <label class="field-label" for="full_name">Full name</label>
+              <input
+                class="field-input"
+                type="text"
+                id="full_name"
+                name="full_name"
+                autocomplete="name"
+                placeholder="[PLACEHOLDER: Full name]"
+                required
+                aria-describedby="full_name-error"
+              >
+              <p class="field-error" id="full_name-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="whatsapp">WhatsApp number</label>
+              <input
+                class="field-input field-input--mono"
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                inputmode="tel"
+                autocomplete="tel"
+                placeholder="017XXXXXXXX"
+                pattern="^(?:\+?88)?01[3-9]\d{8}$"
+                required
+                aria-describedby="whatsapp-hint whatsapp-error"
+              >
+              <p class="field-hint" id="whatsapp-hint">Bangladesh mobile number (e.g. 01712345678)</p>
+              <p class="field-error" id="whatsapp-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="email">Email address</label>
+              <input
+                class="field-input"
+                type="email"
+                id="email"
+                name="email"
+                autocomplete="email"
+                placeholder="[PLACEHOLDER: you@example.com]"
+                required
+                aria-describedby="email-error"
+              >
+              <p class="field-error" id="email-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field field--full">
+              <label class="field-label" for="facebook_profile">
+                Facebook profile name or link
+                <span class="label-optional">Optional</span>
+              </label>
+              <input
+                class="field-input"
+                type="text"
+                id="facebook_profile"
+                name="facebook_profile"
+                autocomplete="off"
+                placeholder="[PLACEHOLDER: Profile name or facebook.com/...]"
+                aria-describedby="facebook_profile-error"
+              >
+              <p class="field-error" id="facebook_profile-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="current_band">Current IELTS speaking band</label>
+              <select
+                class="field-select"
+                id="current_band"
+                name="current_band"
+                required
+                aria-describedby="current_band-error"
+              >
+                <option value="">Select band</option>
+                <option value="not-tested">Not tested yet</option>
+                <option value="below-5.5">Below 5.5</option>
+                <option value="5.5">5.5</option>
+                <option value="6.0">6.0</option>
+                <option value="6.5">6.5</option>
+                <option value="7.0">7.0</option>
+                <option value="7.5-plus">7.5 or higher</option>
+              </select>
+              <p class="field-error" id="current_band-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="target_band">Target speaking band</label>
+              <select
+                class="field-select"
+                id="target_band"
+                name="target_band"
+                required
+                aria-describedby="target_band-error"
+              >
+                <option value="">Select target</option>
+                <option value="6.5">6.5</option>
+                <option value="7.0">7.0</option>
+                <option value="7.5">7.5</option>
+                <option value="8.0">8.0</option>
+                <option value="8.5-plus">8.5 or higher</option>
+              </select>
+              <p class="field-error" id="target_band-error" aria-live="polite"></p>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- STEP 2: Payment -->
+        <section class="step-card reveal" aria-labelledby="step-2-heading">
+          <div class="step-legend">
+            <span class="step-number">Step 02</span>
+            <h2 id="step-2-heading" class="step-title">Payment</h2>
+          </div>
+
+          <div class="payment-card">
+            <div class="payment-card__top">
+              <div>
+                <span class="payment-meta-label">Method</span>
+                <p class="payment-method">[bKash / Nagad / Bank]</p>
+              </div>
+              <div class="payment-amount-wrap">
+                <span class="payment-meta-label">Amount</span>
+                <p class="payment-amount" data-payment-amount>[PROGRAM 1 PRICE]</p>
+              </div>
+            </div>
+
+            <div class="payment-number-row">
+              <div>
+                <span class="payment-meta-label">Account number</span>
+                <p class="payment-number" id="payment-number" data-copy-source>[PAYMENT NUMBER]</p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-secondary btn-copy"
+                data-copy-btn
+                aria-describedby="copy-status"
+              >
+                <span class="copy-icon copy-icon--default" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" width="16" height="16" focusable="false">
+                    <rect x="7" y="7" width="9" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"></rect>
+                    <path d="M5 13H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                  </svg>
+                </span>
+                <span class="copy-icon copy-icon--done" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" width="16" height="16" focusable="false">
+                    <path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </span>
+                <span data-copy-label>Copy number</span>
+              </button>
+            </div>
+
+            <p class="sr-only" id="copy-status" aria-live="polite"></p>
+            <p class="payment-instruction">Send the amount, then upload your screenshot below.</p>
+          </div>
+        </section>
+
+        <!-- STEP 3: Upload proof -->
+        <fieldset class="step-card reveal">
+          <legend class="step-legend">
+            <span class="step-number">Step 03</span>
+            <span class="step-title">Upload proof</span>
+          </legend>
+
+          <div class="form-grid">
+            <div class="field field--full">
+              <label class="field-label" for="screenshot">Payment screenshot</label>
+
+              <div
+                class="upload-zone"
+                data-upload-zone
+                tabindex="0"
+                role="button"
+                aria-controls="screenshot"
+                aria-describedby="screenshot-hint screenshot-error"
+              >
+                <input
+                  class="upload-input"
+                  type="file"
+                  id="screenshot"
+                  name="screenshot"
+                  accept="image/jpeg,image/png,image/webp"
+                  required
+                >
+                <div class="upload-zone__prompt" data-upload-prompt>
+                  <span class="upload-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="24" height="24" focusable="false">
+                      <path d="M12 16V6m0 0l-4 4m4-4l4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path d="M4 17v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    </svg>
+                  </span>
+                  <p class="upload-title">Tap to choose a screenshot or drag it here</p>
+                  <p class="upload-meta" id="screenshot-hint">JPG, PNG, or WEBP up to 5 MB</p>
+                </div>
+
+                <div class="upload-preview" data-upload-preview hidden>
+                  <img
+                    class="upload-thumb"
+                    data-upload-thumb
+                    src=""
+                    alt="Uploaded payment screenshot preview"
+                    width="72"
+                    height="72"
+                    loading="lazy"
+                  >
+                  <div class="upload-file-info">
+                    <p class="upload-file-name" data-upload-name></p>
+                    <p class="upload-file-size" data-upload-size></p>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-remove"
+                    data-upload-remove
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              <p class="field-error" id="screenshot-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field field--full">
+              <label class="field-label" for="transaction_id">Transaction ID</label>
+              <input
+                class="field-input field-input--mono"
+                type="text"
+                id="transaction_id"
+                name="transaction_id"
+                autocomplete="off"
+                placeholder="[PLACEHOLDER: e.g. BJK7A29X4Q]"
+                required
+                aria-describedby="transaction_id-error"
+              >
+              <p class="field-error" id="transaction_id-error" aria-live="polite"></p>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Form-level status messages -->
+        <p class="form-status-error" id="form-error" role="alert" aria-live="assertive" hidden></p>
+
+        <!-- Sticky Bottom Summary Bar (Mobile) / Action Footer (Desktop) -->
+        <div class="submit-bar">
+          <div class="submit-bar__inner">
+            <div class="submit-bar__summary">
+              <span class="submit-bar__program" data-bar-program>[PROGRAM 1 NAME]</span>
+              <span class="submit-bar__price" data-bar-price>[PROGRAM 1 PRICE]</span>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary btn-submit"
+              id="submit-btn"
+              disabled
+            >
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span data-submit-label>Submit enrollment</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Calm Confirmation State (shown after simulated or real submission) -->
+      <section
+        class="confirmation-card"
+        id="confirmation-state"
+        tabindex="-1"
+        aria-labelledby="confirmation-heading"
+        aria-live="polite"
+        hidden
+      >
+        <div class="confirmation-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" focusable="false">
+            <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <p class="eyebrow">Received</p>
+        <h2 id="confirmation-heading" class="confirmation-title">Enrollment submitted</h2>
+        <p class="confirmation-message">[CONFIRMATION MESSAGE]</p>
+        <div class="confirmation-meta">
+          <span class="confirmation-meta__label">Program</span>
+          <span class="confirmation-meta__value" data-confirm-program>[PROGRAM 1 NAME]</span>
+        </div>
+        <a class="btn btn-secondary" href="index.html">Return to home</a>
+      </section>
+    </div>
+  </main>
+
+  <!-- Quiet Footer -->
+  <footer class="site-footer site-footer--enroll">
+    <div class="container">
+      <p class="footer-copy">&copy; [YEAR] Fluency Standard. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
